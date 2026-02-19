@@ -3,9 +3,10 @@ const { sendReservationEmail, sendAdminNotification } = require('../Config/nodem
 
 const createReservation5 = async (req, res) => {
   try {
+    console.log('Received un4 reservation request:', req.body);
+    
     const { email, mobile, firstName, lastName, moveInDate } = req.body;
 
-    // Validate required fields
     if (!email || !mobile || !firstName || !lastName || !moveInDate) {
       return res.status(400).json({
         success: false,
@@ -13,7 +14,6 @@ const createReservation5 = async (req, res) => {
       });
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
@@ -22,7 +22,6 @@ const createReservation5 = async (req, res) => {
       });
     }
 
-    // Mobile validation
     const mobileRegex = /^[0-9]{10,15}$/;
     if (!mobileRegex.test(mobile.replace(/[^0-9]/g, ''))) {
       return res.status(400).json({
@@ -31,7 +30,6 @@ const createReservation5 = async (req, res) => {
       });
     }
 
-    // Date validation
     const selectedDate = new Date(moveInDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -43,7 +41,6 @@ const createReservation5 = async (req, res) => {
       });
     }
 
-    // Create reservation
     const reservation = new Reservation({
       email: email.toLowerCase().trim(),
       mobile: mobile.trim(),
@@ -53,20 +50,18 @@ const createReservation5 = async (req, res) => {
     });
 
     await reservation.save();
+    console.log('Un4 reservation saved:', reservation._id);
 
-    // Send emails
     try {
       await Promise.all([
         sendReservationEmail(reservation),
         sendAdminNotification(reservation)
       ]);
-      console.log('Emails sent successfully');
     } catch (emailError) {
-      console.error('Email sending failed:', emailError);
-      // Don't fail the reservation if email fails
+      console.error('Email failed:', emailError.message);
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Reservation created successfully! Check your email for confirmation.',
       data: {
@@ -81,7 +76,7 @@ const createReservation5 = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Reservation error:', error);
+    console.error('Un4 error:', error);
     
     if (error.code === 11000) {
       return res.status(400).json({
@@ -90,9 +85,10 @@ const createReservation5 = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: 'Server error. Please try again later.'
+      message: 'Server error. Please try again later.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -100,9 +96,3 @@ const createReservation5 = async (req, res) => {
 module.exports = {
   createReservation5
 };
-
-
-
-
-
-
