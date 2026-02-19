@@ -3,8 +3,6 @@ const { sendReservationEmail, sendAdminNotification } = require('../Config/nodem
 
 const createReservation4 = async (req, res) => {
   try {
-    console.log('Received un3 reservation request:', req.body);
-    
     const { email, mobile, firstName, lastName, moveInDate } = req.body;
 
     if (!email || !mobile || !firstName || !lastName || !moveInDate) {
@@ -50,7 +48,6 @@ const createReservation4 = async (req, res) => {
     });
 
     await reservation.save();
-    console.log('Un3 reservation saved:', reservation._id);
 
     try {
       await Promise.all([
@@ -58,25 +55,23 @@ const createReservation4 = async (req, res) => {
         sendAdminNotification(reservation)
       ]);
     } catch (emailError) {
-      console.error('Email failed:', emailError.message);
+      console.error('Email failed:', emailError);
     }
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
-      message: 'Reservation created successfully! Check your email for confirmation.',
+      message: 'Reservation created successfully!',
       data: {
         id: reservation._id,
         email: reservation.email,
         firstName: reservation.firstName,
         lastName: reservation.lastName,
-        moveInDate: reservation.moveInDate,
-        spaceNumber: reservation.spaceNumber,
-        totalCost: reservation.totalCost
+        moveInDate: reservation.moveInDate
       }
     });
 
   } catch (error) {
-    console.error('Un3 error:', error);
+    console.error('Error:', error);
     
     if (error.code === 11000) {
       return res.status(400).json({
@@ -85,10 +80,9 @@ const createReservation4 = async (req, res) => {
       });
     }
 
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: 'Server error. Please try again later.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Server error. Please try again later.'
     });
   }
 };
