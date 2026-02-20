@@ -9,12 +9,12 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendReservationEmail = async (reservationData) => {
-  const { email, firstName, lastName, moveInDate, spaceNumber, spaceSize, totalCost } = reservationData;
-  
+  const { email, firstName, lastName, moveInDate, spaceNumber, spaceSize, totalCost, monthlyRent, adminFee, securityDeposit } = reservationData;
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: 'Storage Space Reservation Confirmation',
+    subject: 'CINDERELLA SELF ONLINE STORAGE',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Reservation Confirmation</h2>
@@ -29,8 +29,11 @@ const sendReservationEmail = async (reservationData) => {
           <hr style="margin: 20px 0;">
           
           <p><strong>Space:</strong> ${spaceNumber} (${spaceSize})</p>
+          <p><strong>Monthly Rent:</strong> $${monthlyRent}</p> 
+          <P><strong>Admin Fee:</strong> $${adminFee}</p>
           <p><strong>Move-in Date:</strong> ${new Date(moveInDate).toLocaleDateString()}</p>
           <p><strong>Total Cost:</strong> $${totalCost}</p>
+          <p><strong>Security Deposit:</strong> $${securityDeposit}</p>
         </div>
         
        
@@ -44,7 +47,7 @@ const sendReservationEmail = async (reservationData) => {
 
 const sendAdminNotification = async (reservationData) => {
   const { email, firstName, lastName, mobile, moveInDate, spaceNumber } = reservationData;
-  
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: process.env.EMAIL_USER,
