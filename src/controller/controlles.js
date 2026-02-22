@@ -136,7 +136,7 @@ const createReservation = async (req, res) => {
       firstName: sanitizedFirstName,
       lastName: sanitizedLastName,
       moveInDate: selectedDate,
-      SpaceNumber: '#3008',
+      spaceNumber: '#3008',  // ✅ FIXED: Changed from SpaceNumber to spaceNumber
       spaceSize: "10' x 10'",
       monthlyRent: 170,
       adminFee: 25,
@@ -197,7 +197,7 @@ const createReservation = async (req, res) => {
         firstName: reservation.firstName,
         lastName: reservation.lastName,
         moveInDate: reservation.moveInDate,
-        spaceNumber: reservation.spaceNumber,
+        spaceNumber: reservation.spaceNumber,  // ✅ Now this will work correctly
         totalCost: reservation.totalCost,
         monthlyRent: reservation.monthlyRent,
         adminFee: reservation.adminFee,
@@ -207,6 +207,7 @@ const createReservation = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Reservation error:', error);
+    console.error('❌ Error stack:', error.stack);  // ✅ ADDED: Better error logging
 
     // ============================================
     // 12. ERROR HANDLING
@@ -241,7 +242,8 @@ const createReservation = async (req, res) => {
     // Generic server error
     res.status(500).json({
       success: false,
-      message: 'Server error. Please try again later.'
+      message: 'Server error. Please try again later.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined  // ✅ ADDED: Show error in dev mode
     });
   }
 };
